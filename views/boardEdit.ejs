@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css" />
+    <link rel="stylesheet" href="/css/index.css" />
+  </head>
+  <body>
+    <form class="form-box" action="/boardEdit" method="POST">
+      <h4>글쓰기</h4>
+      <input name="id" value="<%= post[0].id %>" style="display: none" />
+      <input name="title" value="<%= post[0].title %>" />
+      <input name="content" value="<%= post[0].description %>" />
+      <button type="submit">전송</button>
+    </form>
+  </body>
+</html>
