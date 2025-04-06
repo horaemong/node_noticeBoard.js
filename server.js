@@ -5,6 +5,25 @@ const mysql = require("mysql2");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// login
+
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+
+app.use(passport.initialize());
+app.use(
+  session({
+    secret: "1234",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 60 * 60 * 1000 },
+  })
+);
+
+app.use(passport.session());
+
 // db
 
 var conn = mysql.createConnection({
@@ -160,4 +179,73 @@ app.get("/boardDelete/:id", (req, res) => {
       res.redirect("/board");
     });
   });
+});
+
+// 회원 기능
+
+app.get("/login", (req, res) => {
+  res.render("login.ejs");
+});
+
+passport.use(
+  new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
+    let result;
+
+    var sql = "select * from user WHERE username = ?";
+    conn.query(sql, 입력한아이디, function (err, rows, fields) {
+      if (err) {
+        console.error("error connecting: " + err.stack);
+      }
+      result = rows[0];
+    });
+    if (!result) {
+      return cb(null, false, { message: "아이디 DB에 없음" });
+    }
+    if (result.password == 입력한비번) {
+      return cb(null, result);
+    } else {
+      return cb(null, false, { message: "비번불일치" });
+    }
+  })
+);
+
+passport.serializeUser((user, done) => {
+  process.nextTick(() => {
+    done(null, { id: user._id, username: user.username });
+  });
+});
+
+passport.deserializeUser((user, done) => {
+  process.nextTick(() => {
+    return done(null, user);
+  });
+});
+
+app.post("/login", async (요청, 응답, next) => {
+  passport.authenticate("local", (error, user, info) => {
+    if (error) return 응답.status(500).json(error);
+    if (!user) return 응답.status(401).json(info.message);
+    요청.logIn(user, (err) => {
+      if (err) return next(err);
+      응답.redirect("/");
+    });
+  })(요청, 응답, next);
+});
+
+// 회원가입
+
+app.get("/register", (요청, 응답) => {
+  응답.render("register.ejs");
+});
+
+app.post("/register", (req, res) => {
+  var sql = "INSERT INTO user (`username`, `password`) VALUES(?,?)";
+  param = [req.body.username, req.body.password];
+
+  // conn user용 으로 추가해야함
+  conn.query(sql, param, function (err, result) {
+    if (err) throw err;
+    console.log("1 record inserted");
+  });
+  res.redirect("/");
 });
