@@ -10,7 +10,34 @@
   <body>
     <div class="container">
       <%- include('nav.ejs') %>
-      <div class="content"></div>
+      <div class="content">
+        <div id="graph">
+
+        </div>
     </div>
   </body>
+
+
+  </body>
+
+<script
+    type="text/javascript"
+      src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"
+    ></script>
+    <script>
+      // Create the Lightweight Chart within the container element
+      const chart = LightweightCharts.createChart(
+            document.getElementById('graph')
+      );
+      const candleStickData = generateCandlestickData();
+
+
+      // Generate sample data to use within a candlestick series
+
+
+      // Create the Main Series (Candlesticks)
+      const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
+      // Set the data for the Main Series
+      mainSeries.setData(candleStickData);
+    </script>
 </html>
